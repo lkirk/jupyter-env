@@ -1,0 +1,14 @@
+{
+  "display_name": "Julia 1.10.5",
+  "argv": [
+    "/home/lkirk/.julia/juliaup/julia-1.10.5+0.x64.linux.gnu/bin/julia",
+    "-i",
+    "--color=yes",
+    "--project=@.",
+    "/home/lkirk/.julia/packages/IJulia/bHdNn/src/kernel.jl",
+    "{connection_file}"
+  ],
+  "language": "julia",
+  "env": {},
+  "interrupt_mode": "signal"
+}

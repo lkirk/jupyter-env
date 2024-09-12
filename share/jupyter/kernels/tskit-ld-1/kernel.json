@@ -1,0 +1,14 @@
+{
+    "argv": [
+        "${HOME}/repo/tskit-ld/ve/bin/python",
+        "-m",
+        "ipykernel_launcher",
+        "-f",
+        "{connection_file}"
+    ],
+    "display_name": "tskit-ld",
+    "language": "python",
+    "metadata": {
+        "debugger": true
+    }
+}
