@@ -1,0 +1,13 @@
+[Unit]
+Description=Jupyter Lab
+
+[Service]
+EnvironmentFile=%h/.config/systemd/user/jupyterlab.service.env
+ExecStart=/bin/bash -c ' \
+    echo "Notebook environment: %h/.venv/notebook/$JUPYTERLAB_NOTEBOOK_NUM"; \
+    source "%h/.venv/notebooks/$JUPYTERLAB_NOTEBOOK_NUM/bin/activate"; \
+    jupyter lab --ip "$JUPYTERLAB_IP" --no-browser --notebook-dir %h \
+'
+
+[Install]
+WantedBy=default.target
