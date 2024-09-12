@@ -23,7 +23,8 @@ JUPYTERLAB_IP="<your ip>"
 Install the kernel specs into the user home
 
 ```bash
-ln -s $(pwd)/share/jupyter/kernels ~/.local/share/jupyter
+mkdir ~/.local/share/jupyter
+ln -s $(pwd)/share/jupyter/kernels ~/.local/share/jupyter/kernels
 ```
 
 Create virtual environment for jupyterlab (see `--help` for more)
