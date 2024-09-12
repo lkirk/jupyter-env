@@ -2,10 +2,10 @@
 
 set -eo pipefail
 
-ARGS=$(getopt -s bash -o hskv: --longoptions help,no-systemd,no-kernels,ve-path -n "$(basename "$0")" -- "$@")
+ARGS=$(getopt -s bash -o hskv: --longoptions help,ve-path -n "$(basename "$0")" -- "$@")
 
 usage () {
-    echo "usage: $(basename "$0") [-v|--ve-path] [-s|--no-systemd] [-k|--no-kernels] [--help]"
+    echo "usage: $(basename "$0") [-v|--ve-path] [--help]"
     exit 1
 }
 
@@ -13,14 +13,10 @@ eval set -- "$ARGS"
 
 DEFAULT_VE_DIR=~/.venv/notebooks
 VE_PATH=''
-NO_SYSTEMD=''
-NO_KERNELS=''
 while true; do
     case "$1" in
 	-h | --help) usage;;
     -v | --ve-path) VE_PATH="$2"; shift 2; break;;
-    -s | --no-systemd) NO_SYSTEMD="1"; shift; break;;
-    -k | --no-kernels) NO_KERNELS="1"; shift; break;;
 	-- ) shift; break;;
 	* ) echo "$1"; break;;
     esac
