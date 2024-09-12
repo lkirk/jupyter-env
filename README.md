@@ -17,3 +17,9 @@ Install the kernel specs into the user home
 ```bash
 ln -s $(pwd)/share/jupyter/kernels ~/.local/share/jupyter
 ```
+
+Create virtual environment for jupyterlab (see `--help` for more)
+
+```bash
+./scripts/make-notebook-ve
+```
