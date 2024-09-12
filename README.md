@@ -1,10 +1,19 @@
 # Jupyter Env
 
-Simple script for creating/maintaining jupyterlab environments.
+My jupyterlab setup, complete with kernels, a systemd service and a script for
+creating virtual environments.
 
-Eventually, this will hold all of my jupyterlab settings, etc so that my
-environment is somewhat reproducible.
+## Installation
 
-TODO:
-install systemd unit with script
-backup kernels
+Install the systemd unit for the user
+
+```bash
+ln -s etc/jupyterlab.service ~/.config/systemd/user
+systemctl --user daemon-reload
+```
+
+Install the kernel specs into the user home
+
+```bash
+ln -s $(pwd)/share/jupyter/kernels ~/.local/share/jupyter
+```
