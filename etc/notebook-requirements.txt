@@ -2,4 +2,5 @@ black
 isort
 jupyterlab
 jupyterlab_code_formatter
+jupyterlab_theme_solarized_dark
 jupyterlab_vim

@@ -2,7 +2,7 @@
 
 set -eo pipefail
 
-ARGS=$(getopt -s bash -o hskv: --longoptions help,ve-path -n "$(basename "$0")" -- "$@")
+ARGS=$(getopt -s bash -o hv: --longoptions help,ve-path -n "$(basename "$0")" -- "$@")
 
 usage () {
     echo "usage: $(basename "$0") [-v|--ve-path] [--help]"
@@ -60,4 +60,8 @@ source "$VE_PATH/bin/activate"
 
 pip install nodeenv
 nodeenv --python-virtualenv
+deactivate
+# reactivate environment to get node env variables
+# shellcheck disable=SC1091
+source "$VE_PATH/bin/activate"
 pip install -r "$REPO_DIR/etc/notebook-requirements.txt"
