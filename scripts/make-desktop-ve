@@ -1,0 +1,112 @@
+#!/bin/bash
+
+set -eo pipefail
+
+ARGS=$(getopt -s bash -o hv: --longoptions help,ve-path -n "$(basename "$0")" -- "$@")
+
+usage () {
+    echo "usage: $(basename "$0") [-v|--ve-path] [--help]"
+    exit 1
+}
+
+eval set -- "$ARGS"
+
+DEFAULT_VE_DIR=~/.venv/jldesktop
+VE_PATH=''
+while true; do
+    case "$1" in
+	-h | --help) usage;;
+    -v | --ve-path) VE_PATH="$2"; shift 2; break;;
+	-- ) shift; break;;
+	* ) echo "$1"; break;;
+    esac
+done
+
+set -u
+
+function find_envs {
+    (cd "$DEFAULT_VE_DIR"; find . -maxdepth 1 -mindepth 1 -type d -printf '%P\n')
+}
+
+if [[ -z "$VE_PATH" ]]; then
+    if [[ ! -d "$DEFAULT_VE_DIR" ]]; then
+        echo "Error: Default ve dir does not exist: $DEFAULT_VE_DIR"
+        echo "       Please make before continuing"
+        exit 1
+    fi
+    if [[ $(find_envs | wc -l) == 0 ]]; then
+       VE_PATH="$DEFAULT_VE_DIR/1"
+    else
+        LAST_ENV=$(find_envs | sort -nr | head -1)
+        VE_PATH="$DEFAULT_VE_DIR/$(( "$LAST_ENV" + 1 ))"
+    fi
+fi
+
+if [[ -z "$VE_PATH" ]]; then
+    echo "Error: no ve path specified"
+    exit 1
+elif [[ -d "$VE_PATH" ]]; then
+    echo "Error: $VE_PATH exists, remove and rerun"
+    exit 1
+fi
+
+echo "Creating venv at $VE_PATH"
+
+REPO_DIR="$(realpath "$(dirname "$(readlink -f "$0")")/..")"
+
+python -m venv "$VE_PATH"
+# shellcheck disable=SC1091
+source "$VE_PATH/bin/activate"
+
+pip install nodeenv
+nodeenv --python-virtualenv
+deactivate
+
+# reactivate environment to get node env variables
+# shellcheck disable=SC1091
+source "$VE_PATH/bin/activate"
+pip install 'ipywidgets>=8.0.1' 'jupyterlab==4.2.5'
+npm install --global yarn
+cd "$VE_PATH/src"
+wget 'https://github.com/jupyterlab/jupyterlab-desktop/archive/refs/tags/v4.2.5-1.tar.gz'
+tar -xf 'v4.2.5-1.tar.gz'
+rm 'v4.2.5-1.tar.gz'
+cd 'jupyterlab-desktop-4.2.5-1'
+yarn install
+yarn build
+PATH="$(pwd)/node_modules/.bin:$PATH"
+
+npm install --global '@electron-forge/cli' '@electron-forge/maker-zip'
+
+cat <<EOF > forge.config.js
+module.exports = {
+  packagerConfig: {
+    asar: true,
+  },
+  rebuildConfig: {},
+  makers: [
+    {
+      name: '@electron-forge/maker-zip',
+      platforms: ['linux'],
+    }
+  ]
+};
+EOF
+
+electron-forge make
+cd ../../bin
+unzip ../src/jupyterlab-desktop-4.2.5-1/out/make/zip/linux/x64/jupyterlab-desktop-linux-x64-4.2.5-1.zip
+mv jupyterlab-desktop-linux-x64/* .
+rmdir jupyterlab-desktop-linux-x64
+cd ..
+rm -r 'src'
+rm -r 'lib/node_modules/@electron-forge'
+
+cat <<'EOF' > bin/jl-desktop
+#!/bin/bash
+SCRIPT_DIR="$( dirname -- "$( readlink -f -- "$0"; )"; )"
+source $SCRIPT_DIR/activate
+jupyterlab-desktop "$@"
+EOF
+
+chmod +x bin/jl-desktop
